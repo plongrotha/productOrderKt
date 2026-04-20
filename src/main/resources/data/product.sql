@@ -1,0 +1,22 @@
+INSERT INTO products (created_at, description, price, product_name, stock_quantity, updated_at)
+VALUES
+    (NOW(), 'this is description', 1.00, 'IPhone 17 Pro', 50, NOW()),
+    (NOW(), 'latest samsung flagship phone', 10.00, 'Samsung Galaxy S25', 40, NOW()),
+    (NOW(), 'high performance with affordable price', 750.50, 'Xiaomi 15 Ultra', 60, NOW()),
+    (NOW(), 'best android camera experience', 799.00, 'Google Pixel 9', 35, NOW()),
+    (NOW(), 'fast and smooth performance', 720.25, 'OnePlus 13', 45, NOW()),
+    (NOW(), 'budget friendly smartphone', 299.99, 'Realme C55', 80, NOW()),
+    (NOW(), 'gaming performance beast', 650.00, 'Asus ROG Phone 8', 25, NOW()),
+    (NOW(), 'compact and powerful', 850.00, 'IPhone 16', 30, NOW()),
+    (NOW(), 'foldable smartphone', 1200.00, 'Samsung Galaxy Z Fold 6', 15, NOW()),
+    (NOW(), 'lightweight and fast', 540.00, 'Vivo V30', 55, NOW()),
+    (NOW(), 'great battery life', 430.00, 'Oppo Reno 11', 65, NOW()),
+    (NOW(), 'mid-range performance', 500.00, 'Nothing Phone 2', 20, NOW()),
+    (NOW(), 'flagship killer', 670.00, 'Poco F6 Pro', 70, NOW()),
+    (NOW(), 'excellent camera system', 980.00, 'Huawei P70 Pro', 18, NOW()),
+    (NOW(), 'stylish and powerful', 610.00, 'Honor Magic 6', 22, NOW()),
+    (NOW(), 'affordable 5G phone', 320.00, 'Samsung Galaxy A55', 75, NOW()),
+    (NOW(), 'high refresh display', 450.00, 'Redmi Note 13 Pro', 90, NOW()),
+    (NOW(), 'premium design', 1100.00, 'Sony Xperia 1 VI', 12, NOW()),
+    (NOW(), 'best for photography', 880.00, 'Google Pixel 8 Pro', 28, NOW()),
+    (NOW(), 'fast charging support', 390.00, 'Infinix Zero Ultra', 85, NOW());
