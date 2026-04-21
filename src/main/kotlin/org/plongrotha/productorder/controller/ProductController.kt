@@ -66,13 +66,10 @@ class ProductController(private val productService: ProductService) {
     )
     @GetMapping("/page")
     fun getAllProductWithPagination(
-
         @Parameter(description = "Page number (starts from 0)") @RequestParam(defaultValue = "0") @Min(0) page: Int,
-
         @Parameter(
             description = "Number of records per page", example = "10"
         ) @RequestParam(defaultValue = "10") @Positive @Min(1) size: Int
-
     ): ResponseEntity<PaginationResponse<ProductResponse>> {
 
         val pageable = PageRequest.of(page, size)
@@ -82,7 +79,7 @@ class ProductController(private val productService: ProductService) {
     }
 
     @Operation(summary = "Update product price")
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id}/price")
     fun updateProductPrice(@PathVariable id: Long, @RequestBody request: ProductPriceUpdate) =
         success(data = productService.updatePrice(id, request), message = "")
 }

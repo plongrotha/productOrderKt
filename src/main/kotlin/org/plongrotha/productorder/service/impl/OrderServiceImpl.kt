@@ -12,6 +12,8 @@ import org.plongrotha.productorder.repository.OrderItemRepository
 import org.plongrotha.productorder.repository.OrderRepository
 import org.plongrotha.productorder.repository.ProductRepository
 import org.plongrotha.productorder.service.OrderService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,6 +26,7 @@ class OrderServiceImpl(
     private val customerRepo: CustomerRepository,
     private val productRepo: ProductRepository,
     private val orderItemRepo: OrderItemRepository,
+    private val log: Logger = LoggerFactory.getLogger(OrderServiceImpl::class.java)
 ) : OrderService {
 
     @Transactional
@@ -33,14 +36,15 @@ class OrderServiceImpl(
                 "Customer with with id ${orderRequest.customerId} is not found"
             )
 
-        val order = orderRepo.save(Order(customer = customer, totalAmount = BigDecimal.ZERO))
+        log.debug("customer : {}", customer)
 
+        val order = orderRepo.save(Order(customer = customer, totalAmount = BigDecimal.ZERO))
+        log.info("order : $order")
 
         val orderItem = orderRequest.items.map { itemRequest ->
 
             val product = productRepo.findByIdOrNull(itemRequest.productId)
                 ?: throw ResourceNotFoundException("Product with Id : ${itemRequest.productId} is not found.")
-
 
             val stock = product.stockQuantity ?: 0
 
@@ -52,13 +56,15 @@ class OrderServiceImpl(
             productRepo.save(product)
 
             val itemPrice = product.price ?: BigDecimal.ZERO
+            log.info("itemPrice : {}", itemPrice)
 
             OrderItem(
                 order = order,
                 product = product,
                 quantity = itemRequest.qty,
-                unitPrice = itemPrice // Store actual unit price
+                unitPrice = itemPrice
             )
+
         }
 
         val totalAmount = orderItem.sumOf { it.unitPrice!!.multiply(BigDecimal(it.quantity)) }
@@ -85,9 +91,9 @@ class OrderServiceImpl(
 
             val stock = product.stockQuantity
 
-                if (stock < itemRequest.qty) {
-                    throw IllegalArgumentException("Not enough stock for product ${product.productName}, In stock is ${product.stockQuantity} but order qty is ${itemRequest.qty}")
-                }
+            if (stock < itemRequest.qty) {
+                throw IllegalArgumentException("Not enough stock for product ${product.productName}, In stock is ${product.stockQuantity} but order qty is ${itemRequest.qty}")
+            }
 
             product.stockQuantity = stock.minus(itemRequest.qty)
             productRepo.save(product)
