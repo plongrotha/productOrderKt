@@ -23,7 +23,7 @@ data class ProductRequest(
         description = "Current number of items available in the warehouse", example = "50"
     ) @field:NotNull(message = "Stock is required") @field:Min(
         value = 0, message = "Stock cannot be negative"
-    ) var stockQuantity: Int?,
+    ) var stockQuantity: Int,
 
 
     @field:Schema(

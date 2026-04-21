@@ -8,6 +8,8 @@ interface OrderService {
 
     fun createOrder(orderRequest: OrderRequest): Unit
 
+    fun createOrderV2(orderRequest: OrderRequest): OrderResponse
+
     fun getAllOrders(): List<OrderResponse>
 
 }

@@ -28,41 +28,85 @@ class OrderServiceImpl(
 
     @Transactional
     override fun createOrder(orderRequest: OrderRequest) {
-        val customer = customerRepo.findByIdOrNull(orderRequest.customerId)
-            ?: throw ResourceNotFoundException("Customer with with id ${orderRequest.customerId} is not found")
+        val customer =
+            customerRepo.findByIdOrNull(orderRequest.customerId) ?: throw ResourceNotFoundException(
+                "Customer with with id ${orderRequest.customerId} is not found"
+            )
 
         val order = orderRepo.save(Order(customer = customer, totalAmount = BigDecimal.ZERO))
 
-        var totalAmount = BigDecimal.ZERO
 
         val orderItem = orderRequest.items.map { itemRequest ->
 
             val product = productRepo.findByIdOrNull(itemRequest.productId)
                 ?: throw ResourceNotFoundException("Product with Id : ${itemRequest.productId} is not found.")
 
-            product.stockQuantity?.let {
-                if (it < itemRequest.qty) {
-                    throw IllegalArgumentException("Not enough stock for product ${product.productName}, In stock is ${product.stockQuantity} but order qty is ${itemRequest.qty}")
-                }
+
+            val stock = product.stockQuantity ?: 0
+
+            if (stock < itemRequest.qty) {
+                throw IllegalArgumentException("Not enough stock for product ${product.productName}, In stock is ${product.stockQuantity} but order qty is ${itemRequest.qty}")
             }
 
-            product.stockQuantity = product.stockQuantity?.minus(itemRequest.qty)
+            product.stockQuantity = stock - itemRequest.qty
             productRepo.save(product)
 
-            val totalItem = product.price?.multiply(BigDecimal(itemRequest.qty))
-
-            totalAmount = totalAmount.add(totalItem)
+            val itemPrice = product.price ?: BigDecimal.ZERO
 
             OrderItem(
-                order = order, product = product, quantity = itemRequest.qty, unitPrice = totalItem,
+                order = order,
+                product = product,
+                quantity = itemRequest.qty,
+                unitPrice = itemPrice // Store actual unit price
             )
         }
 
-        orderItemRepo.saveAll(orderItem)
+        val totalAmount = orderItem.sumOf { it.unitPrice!!.multiply(BigDecimal(it.quantity)) }
 
         order.totalAmount = totalAmount
+        order.items.addAll(orderItem)
 
         orderRepo.save(order)
+        orderItemRepo.saveAll(orderItem)
+    }
+
+    override fun createOrderV2(orderRequest: OrderRequest): OrderResponse {
+        val customer =
+            customerRepo.findByIdOrNull(orderRequest.customerId) ?: throw ResourceNotFoundException(
+                "Customer with with id ${orderRequest.customerId} is not found"
+            )
+
+        val order = orderRepo.save(Order(customer = customer, totalAmount = BigDecimal.ZERO))
+
+        val orderItem = orderRequest.items.map { itemRequest ->
+
+            val product = productRepo.findByIdOrNull(itemRequest.productId)
+                ?: throw ResourceNotFoundException("Product with Id : ${itemRequest.productId} is not found.")
+
+            val stock = product.stockQuantity
+
+                if (stock < itemRequest.qty) {
+                    throw IllegalArgumentException("Not enough stock for product ${product.productName}, In stock is ${product.stockQuantity} but order qty is ${itemRequest.qty}")
+                }
+
+            product.stockQuantity = stock.minus(itemRequest.qty)
+            productRepo.save(product)
+
+            val itemPrice = product.price ?: BigDecimal.ZERO
+
+            OrderItem(
+                order = order, product = product, quantity = itemRequest.qty, unitPrice = itemPrice
+            )
+        }
+
+        val totalAmount = orderItem.sumOf { it.unitPrice!!.multiply(BigDecimal(it.quantity)) }
+
+        order.totalAmount = totalAmount
+        order.items.addAll(orderItem)
+        orderItemRepo.saveAll(orderItem)
+        orderRepo.save(order)
+
+        return order.toResponse()
     }
 
     override fun getAllOrders(): List<OrderResponse> {

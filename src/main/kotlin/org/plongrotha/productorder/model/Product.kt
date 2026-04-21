@@ -15,7 +15,7 @@ data class Product(
 
     @Column(name = "price") var price: BigDecimal?,
 
-    @Column(name = "stockQuantity") var stockQuantity: Int?,
+    @Column(name = "stockQuantity") var stockQuantity: Int,
 
     var imageUrl: String? = "",
 

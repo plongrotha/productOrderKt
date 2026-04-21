@@ -21,8 +21,15 @@ class OrderController(private val orderService: OrderService) {
         return success(data = null, message = "Order created successfully")
     }
 
+
+    @Deprecated(message = "Deprecated", level = DeprecationLevel.HIDDEN)
+    @PostMapping("/createOrderV2")
+    @Operation(summary = "Create a order V2")
+    fun createOrderV2(@RequestBody orderRequest: OrderRequest) = success(
+        data = orderService.createOrderV2(orderRequest), message = "Ordering created successfully"
+    )
+
     @Operation(summary = "Get all order")
     @GetMapping
     fun getAllOrders() = success(data = orderService.getAllOrders())
-
 }
