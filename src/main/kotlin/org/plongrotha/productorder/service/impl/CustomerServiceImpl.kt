@@ -9,6 +9,8 @@ import org.plongrotha.productorder.model.Customer
 import org.plongrotha.productorder.repository.CustomerRepository
 import org.plongrotha.productorder.service.CustomerService
 import org.plongrotha.productorder.util.toPaginationResponse
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -17,10 +19,14 @@ import java.time.Period
 
 
 @Service
-class CustomerServiceImpl(private val customerRepo: CustomerRepository) : CustomerService {
+class CustomerServiceImpl(
+    private val customerRepo: CustomerRepository,
+    private val log: Logger = LoggerFactory.getLogger(CustomerService::class.java)
+) : CustomerService {
 
     override fun getCustomerById(id: Long): CustomerResponse? {
-        return customerRepo.findById(id).orElseThrow { ResourceNotFoundException("") }.toResponse()
+        return customerRepo.findByIdOrNull(id)?.toResponse()
+            ?: throw ResourceNotFoundException("not found customer with id $id")
     }
 
     override fun getCustomersPagination(pageable: Pageable): PaginationResponse<CustomerResponse> {
@@ -30,8 +36,9 @@ class CustomerServiceImpl(private val customerRepo: CustomerRepository) : Custom
     override fun updateCustomer(
         id: Long, request: CustomerRequest
     ): CustomerResponse {
-        val customer = customerRepo.findById(id)
-            .orElseThrow { ResourceNotFoundException("customer with id $id is not found") }
+
+        val customer =
+            customerRepo.findByIdOrNull(id) ?: throw ResourceNotFoundException("customer with id $id is not found")
 
         val updatedCustomer = customer.copy(
             firstName = request.firstName,
@@ -46,8 +53,8 @@ class CustomerServiceImpl(private val customerRepo: CustomerRepository) : Custom
     }
 
     override fun deleteCustomer(id: Long) {
-        val customer = customerRepo.findByIdOrNull(id)
-            ?: throw ResourceNotFoundException("customer with id $id is not found")
+        val customer =
+            customerRepo.findByIdOrNull(id) ?: throw ResourceNotFoundException("customer with id $id is not found")
         customerRepo.delete(customer)
     }
 
