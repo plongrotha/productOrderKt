@@ -17,20 +17,20 @@ import java.time.Period
 
 
 @Service
-class CustomerServiceImpl(private val customerRepository: CustomerRepository) : CustomerService {
+class CustomerServiceImpl(private val customerRepo: CustomerRepository) : CustomerService {
 
     override fun getCustomerById(id: Long): CustomerResponse? {
-        return customerRepository.findById(id).orElseThrow { ResourceNotFoundException("") }.toResponse()
+        return customerRepo.findById(id).orElseThrow { ResourceNotFoundException("") }.toResponse()
     }
 
     override fun getCustomersPagination(pageable: Pageable): PaginationResponse<CustomerResponse> {
-        return customerRepository.findAllPagination(pageable).toPaginationResponse { it.toResponse() }
+        return customerRepo.findAllPagination(pageable).toPaginationResponse { it.toResponse() }
     }
 
     override fun updateCustomer(
         id: Long, request: CustomerRequest
     ): CustomerResponse {
-        val customer = customerRepository.findById(id)
+        val customer = customerRepo.findById(id)
             .orElseThrow { ResourceNotFoundException("customer with id $id is not found") }
 
         val updatedCustomer = customer.copy(
@@ -42,13 +42,13 @@ class CustomerServiceImpl(private val customerRepository: CustomerRepository) : 
             age = Period.between(request.dob, LocalDate.now()).years
         )
 
-        return customerRepository.save(updatedCustomer).toResponse()
+        return customerRepo.save(updatedCustomer).toResponse()
     }
 
     override fun deleteCustomer(id: Long) {
-        val customer = customerRepository.findByIdOrNull(id)
+        val customer = customerRepo.findByIdOrNull(id)
             ?: throw ResourceNotFoundException("customer with id $id is not found")
-        customerRepository.delete(customer)
+        customerRepo.delete(customer)
     }
 
     override fun createCustomer(request: CustomerRequest) {
@@ -71,11 +71,11 @@ class CustomerServiceImpl(private val customerRepository: CustomerRepository) : 
                 age = it.dob?.let { Period.between(it, LocalDate.now()).years },
             )
         }
-        customerRepository.save(newCustomerV2)
+        customerRepo.save(newCustomerV2)
     }
 
     override fun getAllCustomer(): List<CustomerResponse> {
-        return customerRepository.findAll().map { it.toResponse() }
+        return customerRepo.findAll().map { it.toResponse() }
     }
 
     override fun createCustomerBulk(request: List<CustomerRequest>): List<CustomerResponse> {
@@ -90,7 +90,6 @@ class CustomerServiceImpl(private val customerRepository: CustomerRepository) : 
                 phone = request.phone
             )
         }
-
-        return customerRepository.saveAll(customerList).map { it.toResponse() }
+        return customerRepo.saveAll(customerList).map { it.toResponse() }
     }
 }

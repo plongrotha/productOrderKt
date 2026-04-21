@@ -7,20 +7,17 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 
 
-// For GET or POST (Success with data)
 fun <T> success(data: T?, message: String = "Success"): ResponseEntity<ApiResponse<T>> {
     val body = ApiResponse(success = true, message = message, data = data)
     return ResponseEntity.ok(body)
 }
 
-// For DELETE (Success without data)
 fun delete(message: String = "Deleted successfully"): ResponseEntity<ApiResponse<Nothing>> {
     val body = ApiResponse<Nothing>(success = true, message = message)
     return ResponseEntity.ok(body)
 }
 
 
-// For ERRORS (Like 404 or 400)
 fun error(message: String, status: HttpStatus): ResponseEntity<ApiResponse<Nothing>> {
     val body = ApiResponse<Nothing>(success = false, message = message)
     return ResponseEntity.status(status).body(body)

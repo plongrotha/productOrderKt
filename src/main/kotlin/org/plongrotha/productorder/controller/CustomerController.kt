@@ -56,7 +56,7 @@ class CustomerController(private val customerService: CustomerService) {
     @Operation(summary = "Delete a customer by ID")
     fun deleteCustomer(@PathVariable @Positive @Parameter(description = "Customer Id") id: Long): ResponseEntity<ApiResponse<Nothing>> {
         customerService.deleteCustomer(id)
-        return delete(message = "delete customer successfully".uppercase())
+        return delete(message = "delete customer successfully")
     }
 
     @Operation(summary = "Get All customer")
@@ -64,9 +64,7 @@ class CustomerController(private val customerService: CustomerService) {
     fun getAllCustomer() =
         success(data = customerService.getAllCustomer(), message = "All customer retrieve successfully")
 
-
     @PostMapping("/bulk")
     fun createBulkCustomer(@RequestBody request: List<CustomerRequest>) =
         success(data = customerService.createCustomerBulk(request), message = "Customer successfully created")
-
 }
