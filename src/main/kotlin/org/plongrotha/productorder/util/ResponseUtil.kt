@@ -17,7 +17,6 @@ fun delete(message: String = "Deleted successfully"): ResponseEntity<ApiResponse
     return ResponseEntity.ok(body)
 }
 
-
 fun error(message: String, status: HttpStatus): ResponseEntity<ApiResponse<Nothing>> {
     val body = ApiResponse<Nothing>(success = false, message = message)
     return ResponseEntity.status(status).body(body)
@@ -27,11 +26,12 @@ fun <T : Any, R : Any> Page<T>.toPaginationResponse(mapper: (T) -> R): Paginatio
     return PaginationResponse(
         items = this.content.map(mapper),
         page = this.number,
-        totalPages = this.totalPages,
-        totalItems = this.totalElements,
         pageSize = this.size,
+        totalItems = this.totalElements,
+        totalPages = this.totalPages,
         isFirst = this.isFirst,
+        isLast = this.isLast,
         hasNext = this.hasNext(),
-        isLast = this.isLast
+        hasPre = this.hasPrevious()
     )
 }

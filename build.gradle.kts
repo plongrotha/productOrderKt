@@ -38,6 +38,10 @@ dependencies {
     testCompileOnly("org.projectlombok:lombok")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testAnnotationProcessor("org.projectlombok:lombok")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test") // includes JUnit 5, Mockito, AssertJ
+    testImplementation("io.mockk:mockk:1.13.10")           // Kotlin-friendly mocking
+    testImplementation("com.ninja-squad:springmockk:4.0.2") // Spring + MockK integration
 }
 
 kotlin {

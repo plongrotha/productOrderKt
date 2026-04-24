@@ -20,14 +20,14 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/customers")
 class CustomerController(private val customerService: CustomerService) {
 
-    @PostMapping
+    @PostMapping("/create")
     @Operation(summary = "Create a new customer")
     fun createCustomer(@RequestBody request: CustomerRequest): ResponseEntity<ApiResponse<Unit>> {
         customerService.createCustomer(request)
         return success(data = null, message = "Customer created successfully")
     }
 
-    @GetMapping("/page")
+    @GetMapping("/pagination")
     @Operation(summary = "Get a list of all customers with pagination")
     fun getCustomersPagination(
         @RequestParam(defaultValue = "0") page: Int, @RequestParam(defaultValue = "10") @Positive size: Int

@@ -4,6 +4,7 @@ import org.plongrotha.productorder.dto.req.CustomerRequest
 import org.plongrotha.productorder.dto.res.CustomerResponse
 import org.plongrotha.productorder.dto.res.PaginationResponse
 import org.plongrotha.productorder.dto.res.toResponse
+import org.plongrotha.productorder.exception.ResourceLockedException
 import org.plongrotha.productorder.exception.ResourceNotFoundException
 import org.plongrotha.productorder.model.Customer
 import org.plongrotha.productorder.repository.CustomerRepository
@@ -11,11 +12,14 @@ import org.plongrotha.productorder.service.CustomerService
 import org.plongrotha.productorder.util.toPaginationResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.Period
+import java.util.UUID
 
 
 @Service
@@ -52,10 +56,12 @@ class CustomerServiceImpl(
         return customerRepo.save(updatedCustomer).toResponse()
     }
 
+    @Transactional
     override fun deleteCustomer(id: Long) {
         val customer =
             customerRepo.findByIdOrNull(id) ?: throw ResourceNotFoundException("customer with id $id is not found")
         customerRepo.delete(customer)
+
     }
 
     override fun createCustomer(request: CustomerRequest) {

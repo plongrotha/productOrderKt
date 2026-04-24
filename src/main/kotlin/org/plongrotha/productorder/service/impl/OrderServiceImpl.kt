@@ -31,15 +31,11 @@ class OrderServiceImpl(
 
     @Transactional
     override fun createOrder(orderRequest: OrderRequest) {
-        val customer =
-            customerRepo.findByIdOrNull(orderRequest.customerId) ?: throw ResourceNotFoundException(
-                "Customer with with id ${orderRequest.customerId} is not found"
-            )
-
-        log.debug("customer : {}", customer)
+        val customer = customerRepo.findByIdOrNull(orderRequest.customerId) ?: throw ResourceNotFoundException(
+            "Customer with with id ${orderRequest.customerId} is not found"
+        )
 
         val order = orderRepo.save(Order(customer = customer, totalAmount = BigDecimal.ZERO))
-        log.info("order : $order")
 
         val orderItem = orderRequest.items.map { itemRequest ->
 
@@ -56,15 +52,10 @@ class OrderServiceImpl(
             productRepo.save(product)
 
             val itemPrice = product.price ?: BigDecimal.ZERO
-            log.info("itemPrice : {}", itemPrice)
 
             OrderItem(
-                order = order,
-                product = product,
-                quantity = itemRequest.qty,
-                unitPrice = itemPrice
+                order = order, product = product, quantity = itemRequest.qty, unitPrice = itemPrice
             )
-
         }
 
         val totalAmount = orderItem.sumOf { it.unitPrice!!.multiply(BigDecimal(it.quantity)) }
@@ -77,10 +68,9 @@ class OrderServiceImpl(
     }
 
     override fun createOrderV2(orderRequest: OrderRequest): OrderResponse {
-        val customer =
-            customerRepo.findByIdOrNull(orderRequest.customerId) ?: throw ResourceNotFoundException(
-                "Customer with with id ${orderRequest.customerId} is not found"
-            )
+        val customer = customerRepo.findByIdOrNull(orderRequest.customerId) ?: throw ResourceNotFoundException(
+            "Customer with with id ${orderRequest.customerId} is not found"
+        )
 
         val order = orderRepo.save(Order(customer = customer, totalAmount = BigDecimal.ZERO))
 

@@ -7,6 +7,7 @@ data class PaginationResponse<T>(
     val totalItems: Long,
     val pageSize: Int,
     val hasNext: Boolean,
+    val hasPre: Boolean,
     val isFirst: Boolean,
     val isLast: Boolean
 )

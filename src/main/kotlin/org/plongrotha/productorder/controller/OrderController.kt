@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 class OrderController(private val orderService: OrderService) {
 
     @Operation(summary = "Create a order")
-    @PostMapping("/createNewOrder")
+    @PostMapping
     fun createOrder(@RequestBody orderRequest: OrderRequest): Any {
         orderService.createOrder(orderRequest)
         return success(data = null, message = "Order created successfully")

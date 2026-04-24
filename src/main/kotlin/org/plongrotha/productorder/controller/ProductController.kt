@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/products")
 class ProductController(private val productService: ProductService) {
 
-    @PostMapping
+    @PostMapping("AddNew")
     @Operation(summary = "Create a new product")
     fun createProduct(@RequestBody request: ProductRequest): ResponseEntity<ApiResponse<Unit>> {
         productService.createProduct(request)
@@ -29,18 +29,21 @@ class ProductController(private val productService: ProductService) {
 
     @GetMapping
     @Operation(summary = "Get a list of all products")
-    fun getAllProducts() =
-        success(data = productService.getAllProduct(), message = "All products retrieved successfully")
+    fun getAllProducts() = success(
+        data = productService.getAllProduct(), message = "All products retrieved successfully"
+    )
 
     @GetMapping("/{id}")
     @Operation(summary = "Get product details by ID")
-    fun getProductById(@PathVariable @Positive id: Long) =
-        success(data = productService.getById(id), message = "Product details retrieved successfully")
+    fun getProductById(@PathVariable @Positive id: Long) = success(
+        data = productService.getById(id), message = "Product details retrieved successfully"
+    )
 
     @PutMapping("/{id}")
     @Operation(summary = "Update an existing product")
-    fun updateProduct(@PathVariable @Positive id: Long, @RequestBody request: ProductRequest) =
-        success(data = productService.updateProduct(id, request), message = "Product updated successfully")
+    fun updateProduct(@PathVariable @Positive id: Long, @RequestBody request: ProductRequest) = success(
+        data = productService.updateProduct(id, request), message = "Product updated successfully"
+    )
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a product by ID")
@@ -64,10 +67,11 @@ class ProductController(private val productService: ProductService) {
         summary = "Get products with pagination",
         description = "Retrieve a paginated list of products. You can control page number and page size using query parameters."
     )
-    @GetMapping("/page")
+    @GetMapping("/pagination")
     fun getAllProductWithPagination(
-        @Parameter(description = "Page number (starts from 0)") @RequestParam(defaultValue = "0") @Min(0) page: Int,
-        @Parameter(
+        @Parameter(description = "Page number (starts from 0)") @RequestParam(defaultValue = "0") @Min(
+            0
+        ) page: Int, @Parameter(
             description = "Number of records per page", example = "10"
         ) @RequestParam(defaultValue = "10") @Positive @Min(1) size: Int
     ): ResponseEntity<PaginationResponse<ProductResponse>> {
@@ -81,5 +85,5 @@ class ProductController(private val productService: ProductService) {
     @Operation(summary = "Update product price")
     @PatchMapping("/{id}/price")
     fun updateProductPrice(@PathVariable id: Long, @RequestBody request: ProductPriceUpdate) =
-        success(data = productService.updatePrice(id, request), message = "")
+        success(data = productService.updatePrice(id, request))
 }

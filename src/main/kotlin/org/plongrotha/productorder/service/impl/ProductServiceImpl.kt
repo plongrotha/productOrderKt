@@ -40,7 +40,7 @@ class ProductServiceImpl(
             imageUrl = request.imageUrl,
             stockQuantity = request.stockQuantity
         )
-        
+
         return productRepository.save(productUpdate).toResponse()
     }
 
@@ -78,7 +78,7 @@ class ProductServiceImpl(
             it.toResponse()
         }
     }
-    
+
     override fun updatePrice(id: Long, priceUpdate: ProductPriceUpdate): ProductResponse {
         val product =
             productRepository.findById(id).orElseThrow { ResourceNotFoundException("Product with id $id is not found") }

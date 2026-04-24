@@ -2,6 +2,7 @@ package org.plongrotha.productorder.exception
 
 import jakarta.servlet.http.HttpServletRequest
 import org.plongrotha.productorder.dto.res.ApiErrorResponse
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
@@ -9,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.HandlerMethodValidationException
+import java.net.URI
 import java.time.Instant
 import java.time.LocalDateTime
 
@@ -54,8 +56,7 @@ class GlobalException {
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleBadRequest(
-        ex: IllegalArgumentException,
-        request: HttpServletRequest
+        ex: IllegalArgumentException, request: HttpServletRequest
     ): ResponseEntity<ApiErrorResponse> {
 
         val response = ApiErrorResponse(
@@ -67,18 +68,53 @@ class GlobalException {
         return ResponseEntity(response, HttpStatus.BAD_REQUEST)
     }
 
+//    @ExceptionHandler(Exception::class)
+//    fun handleGeneric(
+//        ex: Exception,
+//        request: HttpServletRequest
+//    ): ResponseEntity<ApiErrorResponse> {
+//
+//        val response = ApiErrorResponse(
+//            status = HttpStatus.INTERNAL_SERVER_ERROR.value(),
+//            message = "Unexpected error occurred",
+//            path = request.requestURI
+//        )
+//
+//        return ResponseEntity(response, HttpStatus.INTERNAL_SERVER_ERROR)
+//    }
+
+
+    @ExceptionHandler(DataIntegrityViolationException::class)
+    fun handleConflict(
+        ex: DataIntegrityViolationException, request: HttpServletRequest
+    ): ResponseEntity<ProblemDetail> {
+
+        val problemDetail = ProblemDetail.forStatusAndDetail(
+            HttpStatus.CONFLICT, "Conflict Entity"
+        ).apply {
+            title = "Dependency Conflict"
+            instance = URI.create(request.requestURI)
+            setProperty("error", ex.message)
+            setProperty("timestamp", Instant.now())
+        }
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail)
+    }
+
     @ExceptionHandler(Exception::class)
     fun handleGeneric(
-        ex: Exception,
-        request: HttpServletRequest
-    ): ResponseEntity<ApiErrorResponse> {
+        ex: Exception, request: HttpServletRequest
+    ): ResponseEntity<ProblemDetail> {
 
-        val response = ApiErrorResponse(
-            status = HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            message = "Unexpected error occurred",
-            path = request.requestURI
-        )
+        val problemDetail = ProblemDetail.forStatusAndDetail(
+            HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred on the server."
+        ).apply {
+            title = "Internal Server Error"
+            instance = URI.create(request.requestURI)
+            setProperty("error", ex.message)
+            setProperty("timestamp", Instant.now())
+        }
 
-        return ResponseEntity(response, HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetail)
     }
 }

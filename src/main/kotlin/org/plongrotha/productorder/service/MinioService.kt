@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.ByteArrayInputStream
-import java.util.UUID
+import java.util.*
 
 @Service
 class MinioService {
@@ -20,7 +20,7 @@ class MinioService {
     @Value("\${minio.access-key}")
     private lateinit var accessKey: String
 
-    @Value("{minio.secret-key}")
+    @Value("\${minio.secret-key}")
     private lateinit var secretKey: String
 
     @Value("\${minio.bucket-name}")
@@ -28,7 +28,7 @@ class MinioService {
 
     private lateinit var minioClient: MinioClient
 
-//    @PostConstruct
+        @PostConstruct
     fun init() {
         minioClient = MinioClient.builder().endpoint(url).credentials(accessKey, secretKey).build()
 
